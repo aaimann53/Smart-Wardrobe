@@ -15,9 +15,10 @@ class AppBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
+        color: AppTheme.surface,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.06),
+            color: Colors.black.withValues(alpha: 0.3),
             blurRadius: 20,
             offset: const Offset(0, -4),
           ),
@@ -39,6 +40,8 @@ class AppBottomNav extends StatelessWidget {
               activeIcon: Icon(Icons.checkroom_rounded),
               label: 'Wardrobe',
             ),
+            // empty slot for FAB
+            BottomNavigationBarItem(icon: SizedBox(width: 32), label: ''),
             BottomNavigationBarItem(
               icon: Icon(Icons.calendar_month_outlined),
               activeIcon: Icon(Icons.calendar_month_rounded),

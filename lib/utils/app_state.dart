@@ -1,8 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import '../models/clothing_item.dart';
+import 'dummy_data.dart';
 
 class AppState extends ChangeNotifier {
+  AppState() {
+    clothingItems = List<ClothingItem>.from(DummyData.clothingItems);
+    name = 'Alex';
+    email = 'alex@example.com';
+    favoriteStyle = 'Casual';
+    favoriteColor = 'Blue';
+  }
+
   // ── Profile ──────────────────────────────────────
   String name = '';
   String email = '';
@@ -55,13 +64,16 @@ class AppState extends ChangeNotifier {
 
   void removePlannedOutfit(DateTime date, int index) {
     final key = DateTime(date.year, date.month, date.day);
-    if (plannedOutfits[key] != null) {
-      plannedOutfits[key]!.removeAt(index);
-      if (plannedOutfits[key]!.isEmpty) {
-        plannedOutfits.remove(key);
-      }
-      notifyListeners();
+    final outfitsForDate = plannedOutfits[key];
+
+    if (outfitsForDate == null) return;
+    if (index < 0 || index >= outfitsForDate.length) return;
+
+    outfitsForDate.removeAt(index);
+    if (outfitsForDate.isEmpty) {
+      plannedOutfits.remove(key);
     }
+    notifyListeners();
   }
 
   List<Map<String, String>> getOutfitsForDate(DateTime date) {

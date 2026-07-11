@@ -2,15 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  static const Color primary = Color(0xFF8B6F47);
-  static const Color secondary = Color(0xFFB8956A);
-  static const Color background = Color(0xFFF5F0E8);
-  static const Color surface = Color(0xFFFEFCF8);
-  static const Color accent = Color(0xFFD4A574);
-  static const Color error = Color(0xFFC0392B);
-  static const Color textPrimary = Color(0xFF3D2B1F);
-  static const Color textSecondary = Color(0xFF8B7D6B);
-  static const Color cardShadow = Color(0x1A3D2B1F);
+  // Minimal Closet Palette (Scandinavian-inspired)
+  static const Color primary = Color(0xFF2B2B2B); // charcoal
+  static const Color secondary = Color(0xFFA9B8A3); // soft sage
+  static const Color background = Color(0xFFFAFAF7); // off-white
+  static const Color surface = Color(0xFFFFFFFF); // white
+  static const Color surfaceVariant = Color(0xFFF1F0EB); // card surface
+  static const Color accent = Color(0xFFD98B6E); // warm terracotta
+  static const Color error = Color(0xFFC0564A); // muted red-terracotta
+  static const Color success = Color(0xFF7A9471); // muted sage-green
+  static const Color textPrimary = Color(0xFF2B2B2B); // charcoal
+  static const Color textSecondary = Color(0xFF7A7A73); // warm mid grey
+  static const Color cardShadow = Color(0x1A000000); // soft black shadow
 
   static ThemeData get lightTheme {
     return ThemeData(
@@ -18,11 +21,11 @@ class AppTheme {
       brightness: Brightness.light,
       colorScheme: ColorScheme.light(
         primary: primary,
-        secondary: secondary,
+        secondary: accent,
         surface: surface,
         error: error,
-        onPrimary: Colors.white,
-        onSecondary: Colors.white,
+        onPrimary: background,
+        onSecondary: background,
         onSurface: textPrimary,
       ),
       scaffoldBackgroundColor: background,
@@ -74,7 +77,7 @@ class AppTheme {
         ),
       ),
       appBarTheme: AppBarTheme(
-        backgroundColor: surface,
+        backgroundColor: background,
         foregroundColor: textPrimary,
         elevation: 0,
         centerTitle: false,
@@ -87,7 +90,7 @@ class AppTheme {
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primary,
-          foregroundColor: Colors.white,
+          foregroundColor: background,
           elevation: 0,
           padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
           shape: RoundedRectangleBorder(
@@ -97,7 +100,7 @@ class AppTheme {
       ),
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: background,
+        fillColor: surfaceVariant,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 20,
           vertical: 16,
@@ -112,7 +115,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: primary, width: 2),
+          borderSide: const BorderSide(color: accent, width: 2),
         ),
         errorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
@@ -128,21 +131,29 @@ class AppTheme {
         ),
       ),
       cardTheme: CardThemeData(
-        color: surface,
+        color: surfaceVariant,
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         margin: const EdgeInsets.only(bottom: 12),
       ),
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
-        backgroundColor: surface,
+        backgroundColor: Color(0xFFFFFFFF),
         selectedItemColor: primary,
         unselectedItemColor: textSecondary,
         elevation: 8,
         type: BottomNavigationBarType.fixed,
       ),
       dividerTheme: const DividerThemeData(
-        color: Color(0xFFE8E0D8),
+        color: Color(0xFFE5E3DC),
         thickness: 1,
+      ),
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) return accent;
+          return Colors.transparent;
+        }),
+        checkColor: WidgetStateProperty.all(background),
+        side: const BorderSide(color: textSecondary, width: 1.5),
       ),
     );
   }

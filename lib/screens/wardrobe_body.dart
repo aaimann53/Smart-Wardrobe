@@ -7,6 +7,7 @@ import '../models/wardrobe_category.dart';
 import '../theme/app_theme.dart';
 import '../utils/app_state.dart';
 import '../utils/dummy_data.dart';
+import 'add_clothing_screen.dart';
 
 class WardrobeBody extends StatefulWidget {
   /// If set, the wardrobe opens already filtered to this clothing
@@ -84,16 +85,37 @@ class _WardrobeBodyState extends State<WardrobeBody> {
     final items = context.watch<AppState>().clothingItems;
     final filtered = _filteredItems(items);
 
-    return Column(
+    return Stack(
       children: [
-        _buildSearchBar(),
-        if (_selectedSeason != null) _buildSeasonBanner(),
-        _buildMainCategoryChips(),
-        if (_hasSubcategories && _selectedCategory != 'All')
-          _buildSubcategoryChips(),
-        const SizedBox(height: 12),
-        _buildItemCount(filtered.length),
-        Expanded(child: _buildGrid(filtered, context)),
+        Column(
+          children: [
+            _buildSearchBar(),
+            if (_selectedSeason != null) _buildSeasonBanner(),
+            _buildMainCategoryChips(),
+            if (_hasSubcategories && _selectedCategory != 'All')
+              _buildSubcategoryChips(),
+            const SizedBox(height: 12),
+            _buildItemCount(filtered.length),
+            Expanded(child: _buildGrid(filtered, context)),
+          ],
+        ),
+        Positioned(
+          right: 20,
+          bottom: 24,
+          child: FloatingActionButton.extended(
+            heroTag: 'add_clothing',
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const AddClothingScreen()),
+              );
+            },
+            icon: const Icon(Icons.add_rounded),
+            label: const Text('Add Clothing'),
+            backgroundColor: AppTheme.primary,
+            foregroundColor: Colors.white,
+          ),
+        ),
       ],
     );
   }
@@ -341,7 +363,7 @@ class _WardrobeBodyState extends State<WardrobeBody> {
     }
 
     return GridView.builder(
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 16),
+      padding: const EdgeInsets.fromLTRB(20, 4, 20, 110),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 0.72,

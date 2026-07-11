@@ -74,17 +74,19 @@ class _ProfileBodyState extends State<ProfileBody> {
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
               onTap: () async {
+                final state = context.read<AppState>();
                 Navigator.pop(context);
                 final XFile? image = await _picker.pickImage(
                   source: ImageSource.camera,
                   imageQuality: 80,
                 );
+                if (!mounted) return;
                 if (image != null) {
-                  context.read<AppState>().updateProfile(
-                    newName: context.read<AppState>().name,
-                    newEmail: context.read<AppState>().email,
-                    newStyle: context.read<AppState>().favoriteStyle,
-                    newColor: context.read<AppState>().favoriteColor,
+                  state.updateProfile(
+                    newName: state.name,
+                    newEmail: state.email,
+                    newStyle: state.favoriteStyle,
+                    newColor: state.favoriteColor,
                     newImage: image,
                   );
                 }
@@ -105,17 +107,19 @@ class _ProfileBodyState extends State<ProfileBody> {
                 style: TextStyle(fontWeight: FontWeight.w600),
               ),
               onTap: () async {
+                final state = context.read<AppState>();
                 Navigator.pop(context);
                 final XFile? image = await _picker.pickImage(
                   source: ImageSource.gallery,
                   imageQuality: 80,
                 );
+                if (!mounted) return;
                 if (image != null) {
-                  context.read<AppState>().updateProfile(
-                    newName: context.read<AppState>().name,
-                    newEmail: context.read<AppState>().email,
-                    newStyle: context.read<AppState>().favoriteStyle,
-                    newColor: context.read<AppState>().favoriteColor,
+                  state.updateProfile(
+                    newName: state.name,
+                    newEmail: state.email,
+                    newStyle: state.favoriteStyle,
+                    newColor: state.favoriteColor,
                     newImage: image,
                   );
                 }

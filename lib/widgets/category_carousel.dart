@@ -85,8 +85,6 @@ class _CategoryCarouselState extends State<CategoryCarousel> {
   @override
   void initState() {
     super.initState();
-    // viewportFraction = 1 means each slide takes the FULL screen width,
-    // no peeking of neighboring cards, true full-bleed banner look.
     _controller = PageController(viewportFraction: 1.0);
   }
 
@@ -104,17 +102,21 @@ class _CategoryCarouselState extends State<CategoryCarousel> {
         SizedBox(
           height: widget.height,
           width: double.infinity,
-          child: PageView.builder(
-            controller: _controller,
-            itemCount: widget.categories.length,
-            onPageChanged: (i) => setState(() => _currentPage = i),
-            itemBuilder: (context, index) {
-              final category = widget.categories[index];
-              return _CarouselCard(
-                category: category,
-                onTap: () => widget.onCategoryTap(category),
-              );
-            },
+          child: ClipRRect(
+            borderRadius: BorderRadius.zero,
+            child: PageView.builder(
+              controller: _controller,
+              physics: const BouncingScrollPhysics(),
+              itemCount: widget.categories.length,
+              onPageChanged: (i) => setState(() => _currentPage = i),
+              itemBuilder: (context, index) {
+                final category = widget.categories[index];
+                return _CarouselCard(
+                  category: category,
+                  onTap: () => widget.onCategoryTap(category),
+                );
+              },
+            ),
           ),
         ),
         const SizedBox(height: 10),
@@ -155,23 +157,17 @@ class _CarouselCard extends StatelessWidget {
       child: Stack(
         fit: StackFit.expand,
         children: [
-          Image.asset(
-            category.imageAsset,
-            fit: BoxFit.cover,
-            errorBuilder: (_, _, _) => Container(
-              color: AppTheme.background,
-              child: const Icon(
-                Icons.image_not_supported_outlined,
-                color: AppTheme.textSecondary,
-              ),
-            ),
-          ),
-          Container(
-            decoration: const BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [Colors.transparent, Colors.black54],
+          Positioned.fill(
+            child: Image.asset(
+              category.imageAsset,
+              // Fill the whole slide, edge to edge — no gray bars.
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) => Container(
+                color: AppTheme.background,
+                child: const Icon(
+                  Icons.image_not_supported_outlined,
+                  color: AppTheme.textSecondary,
+                ),
               ),
             ),
           ),
@@ -179,28 +175,36 @@ class _CarouselCard extends StatelessWidget {
             left: 24,
             right: 24,
             bottom: 22,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  category.title,
-                  style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w700,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.black.withValues(alpha: 0.22),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    category.title,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 22,
+                      fontWeight: FontWeight.w700,
+                    ),
                   ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  category.subtitle,
-                  style: const TextStyle(color: Colors.white70, fontSize: 13),
-                ),
-              ],
+                  const SizedBox(height: 2),
+                  Text(
+                    category.subtitle,
+                    style: const TextStyle(color: Colors.white70, fontSize: 13),
+                  ),
+                ],
+              ),
             ),
           ),
+          // Moved from top-right to top-left.
           Positioned(
             top: 16,
-            right: 16,
+            left: 16,
             child: CircleAvatar(
               radius: 15,
               backgroundColor: Colors.white24,
