@@ -1,6 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_state.dart';
 import '../utils/constants.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/gradient_button.dart';
@@ -31,6 +32,18 @@ class _LoginScreenState extends State<LoginScreen> {
       Future.delayed(const Duration(seconds: 1), () {
         if (mounted) {
           setState(() => _isLoading = false);
+
+          // Derive display name from email (everything before @)
+          final email = _emailController.text.trim();
+          final derivedName = email.contains('@') ? email.split('@')[0] : email;
+
+          context.read<AppState>().updateProfile(
+            newName: derivedName,
+            newEmail: email,
+            newStyle: 'Casual',
+            newColor: 'Blue',
+          );
+
           Navigator.pushReplacementNamed(context, '/home');
         }
       });
@@ -49,19 +62,19 @@ class _LoginScreenState extends State<LoginScreen> {
                 borderRadius: const BorderRadius.vertical(
                   bottom: Radius.circular(40),
                 ),
-                child: CachedNetworkImage(
-                  imageUrl: ImageConstants.authHeader,
+                child: Image.asset(
+                  ImageConstants.authHeader,
                   height: size.height * 0.28,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  placeholder: (_, _) => Container(
+                  errorBuilder: (_, _, _) => Container(
                     height: size.height * 0.28,
                     color: AppTheme.primary.withValues(alpha: 0.1),
-                  ),
-                  errorWidget: (_, _, _) => Container(
-                    height: size.height * 0.28,
-                    color: AppTheme.primary.withValues(alpha: 0.1),
-                    child: const Icon(Icons.image, size: 60, color: AppTheme.primary),
+                    child: const Icon(
+                      Icons.image,
+                      size: 60,
+                      color: AppTheme.primary,
+                    ),
                   ),
                 ),
               ),
@@ -124,7 +137,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                 content: Text('Password reset link sent!'),
                                 behavior: SnackBarBehavior.floating,
                                 shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(12),
+                                  ),
                                 ),
                               ),
                             );
@@ -155,7 +170,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               AppStrings.orLoginWith,
                               style: TextStyle(
                                 fontSize: 13,
-                                color: AppTheme.textSecondary.withValues(alpha: 0.7),
+                                color: AppTheme.textSecondary.withValues(
+                                  alpha: 0.7,
+                                ),
                               ),
                             ),
                           ),
@@ -167,14 +184,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         width: double.infinity,
                         child: OutlinedButton.icon(
                           onPressed: () {},
-                          icon: ClipRRect(
-                            borderRadius: BorderRadius.circular(2),
-                            child: Image.network(
-                              'https://cdn-icons-png.flaticon.com/512/300/300221.png',
-                              width: 22,
-                              height: 22,
-                              errorBuilder: (_, _, _) => const Icon(Icons.g_mobiledata, size: 24),
-                            ),
+                          icon: Image.asset(
+                            'assets/images/google_icon.png',
+                            width: 22,
+                            height: 22,
+                            errorBuilder: (_, _, _) =>
+                                const Icon(Icons.g_mobiledata, size: 24),
                           ),
                           label: Text(
                             AppStrings.googleLogin,
@@ -190,7 +205,9 @@ class _LoginScreenState extends State<LoginScreen> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                             side: BorderSide(
-                              color: AppTheme.textSecondary.withValues(alpha: 0.2),
+                              color: AppTheme.textSecondary.withValues(
+                                alpha: 0.2,
+                              ),
                             ),
                           ),
                         ),
@@ -208,7 +225,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                           GestureDetector(
                             onTap: () {
-                              Navigator.pushReplacementNamed(context, '/register');
+                              Navigator.pushReplacementNamed(
+                                context,
+                                '/register',
+                              );
                             },
                             child: const Text(
                               AppStrings.register,

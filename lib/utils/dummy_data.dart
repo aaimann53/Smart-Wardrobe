@@ -7,12 +7,12 @@ import 'constants.dart';
 
 class DummyData {
   static final UserModel currentUser = UserModel(
-    id: '1',
-    name: 'Aiman',
-    email: 'aiman@example.com',
-    password: 'password123',
-    favoriteStyle: 'Casual',
-    favoriteColor: 'Blue',
+    id: '',
+    name: '',
+    email: '',
+    password: '',
+    favoriteStyle: '',
+    favoriteColor: '',
     profileImage: ImageConstants.profilePlaceholder,
   );
 
@@ -21,43 +21,91 @@ class DummyData {
     WardrobeCategory(
       name: 'Tops',
       subcategories: [
-        'T-Shirts', 'Shirts', 'Blouses', 'Crop Tops', 'Hoodies',
-        'Sweaters', 'Tank Tops', 'Polo Shirts', 'Tunics', 'Cardigans',
+        'T-Shirts',
+        'Shirts',
+        'Blouses',
+        'Crop Tops',
+        'Hoodies',
+        'Sweaters',
+        'Tank Tops',
+        'Polo Shirts',
+        'Tunics',
+        'Cardigans',
       ],
     ),
     WardrobeCategory(
       name: 'Bottoms',
       subcategories: [
-        'Jeans', 'Trousers', 'Leggings', 'Shorts', 'Skirts',
-        'Cargo Pants', 'Joggers', 'Wide-Leg Pants', 'Formal Pants', 'Denim Shorts',
+        'Jeans',
+        'Trousers',
+        'Leggings',
+        'Shorts',
+        'Skirts',
+        'Cargo Pants',
+        'Joggers',
+        'Wide-Leg Pants',
+        'Formal Pants',
+        'Denim Shorts',
       ],
     ),
     WardrobeCategory(
       name: 'Dresses',
       subcategories: [
-        'Casual Wear', 'Formal Wear', 'Office Wear', 'Wedding Dresses', 'Party Wear',
-        'Evening Gowns', 'Traditional Wear', 'Summer Dresses', 'Maxi Dresses', 'Mini Dresses',
+        'Casual Wear',
+        'Formal Wear',
+        'Office Wear',
+        'Wedding Dresses',
+        'Party Wear',
+        'Evening Gowns',
+        'Traditional Wear',
+        'Summer Dresses',
+        'Maxi Dresses',
+        'Mini Dresses',
       ],
     ),
     WardrobeCategory(
       name: 'Outerwear',
       subcategories: [
-        'Jackets', 'Coats', 'Blazers', 'Trench Coats', 'Parkas',
-        'Leather Jackets', 'Denim Jackets', 'Raincoats', 'Puffer Jackets', 'Capes',
+        'Jackets',
+        'Coats',
+        'Blazers',
+        'Trench Coats',
+        'Parkas',
+        'Leather Jackets',
+        'Denim Jackets',
+        'Raincoats',
+        'Puffer Jackets',
+        'Capes',
       ],
     ),
     WardrobeCategory(
       name: 'Footwear',
       subcategories: [
-        'Sneakers', 'Running Shoes', 'Flats', 'Sandals', 'Heels',
-        'Boots', 'Loafers', 'Slippers', 'Sports Shoes', 'Formal Shoes',
+        'Sneakers',
+        'Running Shoes',
+        'Flats',
+        'Sandals',
+        'Heels',
+        'Boots',
+        'Loafers',
+        'Slippers',
+        'Sports Shoes',
+        'Formal Shoes',
       ],
     ),
     WardrobeCategory(
       name: 'Accessories',
       subcategories: [
-        'Handbags', 'Jewelry', 'Watches', 'Sunglasses', 'Belts',
-        'Scarves', 'Hats & Caps', 'Hair Accessories', 'Wallets', 'Perfumes',
+        'Handbags',
+        'Jewelry',
+        'Watches',
+        'Sunglasses',
+        'Belts',
+        'Scarves',
+        'Hats & Caps',
+        'Hair Accessories',
+        'Wallets',
+        'Perfumes',
       ],
     ),
   ];
@@ -340,7 +388,8 @@ class DummyData {
     NotificationModel(
       id: '1',
       title: 'Outfit Reminder',
-      message: 'You planned to wear "Office Elegance" tomorrow. Prepare your outfit!',
+      message:
+          'You planned to wear "Office Elegance" tomorrow. Prepare your outfit!',
       type: 'reminder',
       icon: 'calendar_today',
       time: '2 min ago',
@@ -349,7 +398,8 @@ class DummyData {
     NotificationModel(
       id: '2',
       title: 'Weather Update',
-      message: 'Tomorrow\'s forecast: 18°C with light rain. Consider adding a jacket.',
+      message:
+          'Tomorrow\'s forecast: 18°C with light rain. Consider adding a jacket.',
       type: 'weather',
       icon: 'wb_sunny',
       time: '1 hour ago',
@@ -358,7 +408,8 @@ class DummyData {
     NotificationModel(
       id: '3',
       title: 'Wardrobe Tip',
-      message: 'Your "Red Running Shoes" haven\'t been worn in 30 days. Time to style them!',
+      message:
+          'Your "Red Running Shoes" haven\'t been worn in 30 days. Time to style them!',
       type: 'tip',
       icon: 'tips_and_updates',
       time: '3 hours ago',
@@ -367,7 +418,8 @@ class DummyData {
     NotificationModel(
       id: '4',
       title: 'Style Inspiration',
-      message: 'New outfit suggestions available for "Party" occasion. Check them out!',
+      message:
+          'New outfit suggestions available for "Party" occasion. Check them out!',
       type: 'inspiration',
       icon: 'lightbulb',
       time: '1 day ago',
@@ -376,7 +428,8 @@ class DummyData {
     NotificationModel(
       id: '5',
       title: 'Seasonal Alert',
-      message: 'Summer is coming! Add your summer wardrobe items to be prepared.',
+      message:
+          'Summer is coming! Add your summer wardrobe items to be prepared.',
       type: 'seasonal',
       icon: 'ac_unit',
       time: '2 days ago',
@@ -423,7 +476,8 @@ class DummyData {
   ];
 
   static const Map<String, String> weatherSuggestions = {
-    'Clear': '☀️ Perfect weather for casual outings. Light fabrics recommended.',
+    'Clear':
+        '☀️ Perfect weather for casual outings. Light fabrics recommended.',
     'Cloudy': '☁️ A light jacket would be perfect for today.',
     'Rainy': '🌧️ Don\'t forget your raincoat and waterproof shoes.',
     'Cold': '❄️ Layer up! Perfect for sweaters and boots.',

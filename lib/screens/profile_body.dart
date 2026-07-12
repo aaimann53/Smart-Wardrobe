@@ -1,14 +1,178 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_state.dart';
 import '../utils/dummy_data.dart';
 
-class ProfileBody extends StatelessWidget {
+class ProfileBody extends StatefulWidget {
   const ProfileBody({super.key});
 
   @override
+  State<ProfileBody> createState() => _ProfileBodyState();
+}
+
+class _ProfileBodyState extends State<ProfileBody> {
+  final ImagePicker _picker = ImagePicker();
+  bool _isEditing = false;
+  late TextEditingController _nameController;
+  late TextEditingController _emailController;
+  late String _selectedStyle;
+  late String _selectedColor;
+
+  @override
+  void initState() {
+    super.initState();
+    final state = context.read<AppState>();
+    _nameController = TextEditingController(text: state.name);
+    _emailController = TextEditingController(text: state.email);
+    _selectedStyle = state.favoriteStyle;
+    _selectedColor = state.favoriteColor;
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickImage() async {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const SizedBox(height: 12),
+            Container(
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: AppTheme.textSecondary.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 20),
+            ListTile(
+              leading: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(Icons.camera_alt, color: AppTheme.primary),
+              ),
+              title: const Text(
+                'Take a Photo',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              onTap: () async {
+                final state = context.read<AppState>();
+                Navigator.pop(context);
+                final XFile? image = await _picker.pickImage(
+                  source: ImageSource.camera,
+                  imageQuality: 80,
+                );
+                if (!mounted) return;
+                if (image != null) {
+                  state.updateProfile(
+                    newName: state.name,
+                    newEmail: state.email,
+                    newStyle: state.favoriteStyle,
+                    newColor: state.favoriteColor,
+                    newImage: image,
+                  );
+                }
+              },
+            ),
+            ListTile(
+              leading: Container(
+                width: 44,
+                height: 44,
+                decoration: BoxDecoration(
+                  color: AppTheme.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(14),
+                ),
+                child: const Icon(Icons.photo_library, color: AppTheme.primary),
+              ),
+              title: const Text(
+                'Choose from Gallery',
+                style: TextStyle(fontWeight: FontWeight.w600),
+              ),
+              onTap: () async {
+                final state = context.read<AppState>();
+                Navigator.pop(context);
+                final XFile? image = await _picker.pickImage(
+                  source: ImageSource.gallery,
+                  imageQuality: 80,
+                );
+                if (!mounted) return;
+                if (image != null) {
+                  state.updateProfile(
+                    newName: state.name,
+                    newEmail: state.email,
+                    newStyle: state.favoriteStyle,
+                    newColor: state.favoriteColor,
+                    newImage: image,
+                  );
+                }
+              },
+            ),
+            const SizedBox(height: 12),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _saveProfile() {
+    context.read<AppState>().updateProfile(
+      newName: _nameController.text.trim(),
+      newEmail: _emailController.text.trim(),
+      newStyle: _selectedStyle,
+      newColor: _selectedColor,
+    );
+    setState(() => _isEditing = false);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Text('Profile updated successfully!'),
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        backgroundColor: AppTheme.primary,
+      ),
+    );
+  }
+
+  Widget _buildProfileImage(AppState state) {
+    if (state.profileImage != null) {
+      return kIsWeb
+          ? Image.network(state.profileImage!.path, fit: BoxFit.cover)
+          : Image.file(File(state.profileImage!.path), fit: BoxFit.cover);
+    }
+    return Image.asset(
+      'assets/images/profile.jpg',
+      fit: BoxFit.cover,
+      errorBuilder: (_, _, _) => Container(
+        color: AppTheme.background,
+        child: const Icon(
+          Icons.person,
+          size: 40,
+          color: AppTheme.textSecondary,
+        ),
+      ),
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final user = DummyData.currentUser;
+    final state = context.watch<AppState>();
     return SingleChildScrollView(
       padding: const EdgeInsets.only(bottom: 80),
       child: Column(
@@ -18,7 +182,9 @@ class ProfileBody extends StatelessWidget {
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 30),
             decoration: BoxDecoration(
               color: AppTheme.surface,
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(40)),
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(40),
+              ),
               boxShadow: AppTheme.softShadow,
             ),
             child: Column(
@@ -35,36 +201,35 @@ class ProfileBody extends StatelessWidget {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(50),
-                        child: CachedNetworkImage(
-                          imageUrl: user.profileImage,
-                          fit: BoxFit.cover,
-                          placeholder: (_, _) => Container(color: AppTheme.background),
-                          errorWidget: (_, _, _) => Container(
-                            color: AppTheme.background,
-                            child: const Icon(Icons.person, size: 40, color: AppTheme.textSecondary),
-                          ),
-                        ),
+                        child: _buildProfileImage(state),
                       ),
                     ),
                     Positioned(
                       bottom: 4,
                       right: 4,
-                      child: Container(
-                        width: 32,
-                        height: 32,
-                        decoration: BoxDecoration(
-                          color: AppTheme.primary,
-                          shape: BoxShape.circle,
-                          border: Border.all(color: Colors.white, width: 3),
+                      child: GestureDetector(
+                        onTap: _pickImage,
+                        child: Container(
+                          width: 32,
+                          height: 32,
+                          decoration: BoxDecoration(
+                            color: AppTheme.primary,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: Colors.white, width: 3),
+                          ),
+                          child: const Icon(
+                            Icons.camera_alt,
+                            size: 16,
+                            color: Colors.white,
+                          ),
                         ),
-                        child: const Icon(Icons.camera_alt, size: 16, color: Colors.white),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
                 Text(
-                  user.name,
+                  state.name,
                   style: const TextStyle(
                     fontSize: 24,
                     fontWeight: FontWeight.w700,
@@ -73,7 +238,7 @@ class ProfileBody extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  user.email,
+                  state.email,
                   style: const TextStyle(
                     fontSize: 14,
                     color: AppTheme.textSecondary,
@@ -83,33 +248,46 @@ class ProfileBody extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 24),
-          _buildInfoCard(
-            icon: Icons.person_outline,
-            label: 'Full Name',
-            value: user.name,
-          ),
-          _buildInfoCard(
-            icon: Icons.email_outlined,
-            label: 'Email',
-            value: user.email,
-          ),
-          _buildInfoCard(
-            icon: Icons.style_outlined,
-            label: 'Style Preference',
-            value: user.favoriteStyle,
-          ),
-          _buildInfoCard(
-            icon: Icons.palette_outlined,
-            label: 'Favorite Color',
-            value: user.favoriteColor,
-          ),
+          if (_isEditing) ...[
+            _buildEditForm(),
+          ] else ...[
+            _buildInfoCard(
+              icon: Icons.person_outline,
+              label: 'Full Name',
+              value: state.name,
+            ),
+            _buildInfoCard(
+              icon: Icons.email_outlined,
+              label: 'Email',
+              value: state.email,
+            ),
+            _buildInfoCard(
+              icon: Icons.style_outlined,
+              label: 'Style Preference',
+              value: state.favoriteStyle,
+            ),
+            _buildInfoCard(
+              icon: Icons.palette_outlined,
+              label: 'Favorite Color',
+              value: state.favoriteColor,
+            ),
+          ],
           const SizedBox(height: 24),
           _buildActionButton(
-            icon: Icons.edit_outlined,
-            label: 'Edit Profile',
-            onTap: () => _showComingSoon(context, 'Edit Profile'),
+            icon: _isEditing ? Icons.save_outlined : Icons.edit_outlined,
+            label: _isEditing ? 'Save Profile' : 'Edit Profile',
+            onTap: _isEditing
+                ? _saveProfile
+                : () => setState(() => _isEditing = true),
             color: AppTheme.primary,
           ),
+          if (_isEditing)
+            _buildActionButton(
+              icon: Icons.close,
+              label: 'Cancel',
+              onTap: () => setState(() => _isEditing = false),
+              color: AppTheme.textSecondary,
+            ),
           _buildActionButton(
             icon: Icons.lock_outline,
             label: 'Change Password',
@@ -126,6 +304,123 @@ class ProfileBody extends StatelessWidget {
           const SizedBox(height: 32),
         ],
       ),
+    );
+  }
+
+  Widget _buildEditForm() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _buildEditField('Full Name', _nameController, Icons.person_outline),
+          const SizedBox(height: 16),
+          _buildEditField(
+            'Email',
+            _emailController,
+            Icons.email_outlined,
+            keyboard: TextInputType.emailAddress,
+          ),
+          const SizedBox(height: 16),
+          _buildDropdown(
+            'Style Preference',
+            _selectedStyle,
+            DummyData.styles,
+            (v) => setState(() => _selectedStyle = v!),
+          ),
+          const SizedBox(height: 16),
+          _buildDropdown(
+            'Favorite Color',
+            _selectedColor,
+            DummyData.colors,
+            (v) => setState(() => _selectedColor = v!),
+          ),
+          const SizedBox(height: 8),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildEditField(
+    String label,
+    TextEditingController controller,
+    IconData icon, {
+    TextInputType keyboard = TextInputType.text,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: AppTheme.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        TextFormField(
+          controller: controller,
+          keyboardType: keyboard,
+          style: const TextStyle(fontSize: 15, color: AppTheme.textPrimary),
+          decoration: InputDecoration(
+            prefixIcon: Icon(icon, color: AppTheme.textSecondary, size: 22),
+            filled: true,
+            fillColor: AppTheme.surface,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(16),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDropdown(
+    String label,
+    String value,
+    List<String> items,
+    ValueChanged<String?> onChanged,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: const TextStyle(
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+            color: AppTheme.textPrimary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          decoration: BoxDecoration(
+            color: AppTheme.surface,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: AppTheme.softShadow,
+          ),
+          child: DropdownButtonHideUnderline(
+            child: DropdownButton<String>(
+              value: value,
+              isExpanded: true,
+              items: items
+                  .map(
+                    (item) => DropdownMenuItem(value: item, child: Text(item)),
+                  )
+                  .toList(),
+              onChanged: onChanged,
+              style: const TextStyle(fontSize: 15, color: AppTheme.textPrimary),
+              icon: const Icon(
+                Icons.keyboard_arrow_down,
+                color: AppTheme.textSecondary,
+              ),
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -177,7 +472,11 @@ class ProfileBody extends StatelessWidget {
               ],
             ),
           ),
-          const Icon(Icons.chevron_right_rounded, color: AppTheme.textSecondary, size: 22),
+          const Icon(
+            Icons.chevron_right_rounded,
+            color: AppTheme.textSecondary,
+            size: 22,
+          ),
         ],
       ),
     );
@@ -225,7 +524,11 @@ class ProfileBody extends StatelessWidget {
                     ),
                   ),
                 ),
-                Icon(Icons.chevron_right_rounded, color: color.withValues(alpha: 0.5), size: 22),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  color: color.withValues(alpha: 0.5),
+                  size: 22,
+                ),
               ],
             ),
           ),
@@ -251,7 +554,11 @@ class ProfileBody extends StatelessWidget {
                   color: AppTheme.accent.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Icon(Icons.construction_rounded, size: 32, color: AppTheme.accent),
+                child: const Icon(
+                  Icons.construction_rounded,
+                  size: 32,
+                  color: AppTheme.accent,
+                ),
               ),
               const SizedBox(height: 20),
               Text(
@@ -274,9 +581,14 @@ class ProfileBody extends StatelessWidget {
                   onPressed: () => Navigator.pop(context),
                   style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
                   ),
-                  child: const Text('Got it', style: TextStyle(fontWeight: FontWeight.w600)),
+                  child: const Text(
+                    'Got it',
+                    style: TextStyle(fontWeight: FontWeight.w600),
+                  ),
                 ),
               ),
             ],
@@ -303,7 +615,11 @@ class ProfileBody extends StatelessWidget {
                   color: AppTheme.error.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(20),
                 ),
-                child: const Icon(Icons.logout_rounded, size: 32, color: AppTheme.error),
+                child: const Icon(
+                  Icons.logout_rounded,
+                  size: 32,
+                  color: AppTheme.error,
+                ),
               ),
               const SizedBox(height: 20),
               const Text(
@@ -330,11 +646,16 @@ class ProfileBody extends StatelessWidget {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(14),
                         ),
-                        side: BorderSide(color: AppTheme.textSecondary.withValues(alpha: 0.2)),
+                        side: BorderSide(
+                          color: AppTheme.textSecondary.withValues(alpha: 0.2),
+                        ),
                       ),
                       child: const Text(
                         'Cancel',
-                        style: TextStyle(color: AppTheme.textPrimary, fontWeight: FontWeight.w600),
+                        style: TextStyle(
+                          color: AppTheme.textPrimary,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
                   ),
@@ -354,7 +675,10 @@ class ProfileBody extends StatelessWidget {
                           borderRadius: BorderRadius.circular(14),
                         ),
                       ),
-                      child: const Text('Logout', style: TextStyle(fontWeight: FontWeight.w600)),
+                      child: const Text(
+                        'Logout',
+                        style: TextStyle(fontWeight: FontWeight.w600),
+                      ),
                     ),
                   ),
                 ],

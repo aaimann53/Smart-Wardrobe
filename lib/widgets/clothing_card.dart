@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../models/clothing_item.dart';
 import '../theme/app_theme.dart';
@@ -39,18 +38,15 @@ class ClothingCard extends StatelessWidget {
                 child: Stack(
                   fit: StackFit.expand,
                   children: [
-                    CachedNetworkImage(
-                      imageUrl: item.imageUrl,
+                    Image.asset(
+                      item.imageUrl,
                       fit: BoxFit.cover,
-                      placeholder: (_, _) => Container(
+                      errorBuilder: (_, _, _) => Container(
                         color: AppTheme.background,
-                        child: const Center(
-                          child: CircularProgressIndicator(strokeWidth: 2),
+                        child: const Icon(
+                          Icons.broken_image,
+                          color: AppTheme.textSecondary,
                         ),
-                      ),
-                      errorWidget: (_, _, _) => Container(
-                        color: AppTheme.background,
-                        child: const Icon(Icons.broken_image, color: AppTheme.textSecondary),
                       ),
                     ),
                     Positioned(
@@ -66,9 +62,13 @@ class ClothingCard extends StatelessWidget {
                             boxShadow: AppTheme.softShadow,
                           ),
                           child: Icon(
-                            item.isFavorite ? Icons.favorite : Icons.favorite_border,
+                            item.isFavorite
+                                ? Icons.favorite
+                                : Icons.favorite_border,
                             size: 18,
-                            color: item.isFavorite ? AppTheme.error : AppTheme.textSecondary,
+                            color: item.isFavorite
+                                ? AppTheme.error
+                                : AppTheme.textSecondary,
                           ),
                         ),
                       ),

@@ -1,15 +1,15 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
-import '../utils/dummy_data.dart';
+import '../utils/app_state.dart';
 import '../widgets/bottom_nav.dart';
 import '../widgets/drawer_widget.dart';
 import 'home_body.dart';
 import 'wardrobe_body.dart';
 import 'planner_body.dart';
 import 'profile_body.dart';
-import 'outfits_body.dart';
-import 'notifications_body.dart';
 
 class MainShell extends StatefulWidget {
   const MainShell({super.key});
@@ -20,8 +20,12 @@ class MainShell extends StatefulWidget {
 
 class _MainShellState extends State<MainShell> {
   int _currentPage = 0;
-  int _lastBottomNavPage = 0;
   final _scaffoldKey = GlobalKey<ScaffoldState>();
+
+  // bottom nav has 5 slots: Home, Wardrobe, [empty], Planner, Profile
+  // page indices:            0     1          -        2        3
+  // internal pages:         Home  Wardrobe  AI(modal) Planner  Profile
+  // extra pages via drawer: Outfits=4, Notifications=5
 
   static const _pageTitles = [
     'Smart Wardrobe',
@@ -32,29 +36,53 @@ class _MainShellState extends State<MainShell> {
     'Notifications',
   ];
 
-  static const _bottomNavIndices = [0, 1, 2, 3];
-
   bool get _isHome => _currentPage == 0;
-  bool get _showFAB => _currentPage == 1 || _currentPage == 2;
+
+  // map bottom nav tap index to page index
+  // 0→Home, 1→Wardrobe, 2→empty(AI), 3→Planner, 4→Profile
+  void _onBottomNavTap(int navIndex) {
+    if (navIndex == 2) {
+      // middle slot — open AI screen
+      Navigator.pushNamed(context, '/ai-suggest');
+      return;
+    }
+    final pageMap = {0: 0, 1: 1, 3: 2, 4: 3};
+    final page = pageMap[navIndex];
+    if (page != null) {
+      setState(() {
+        _currentPage = page;
+      });
+    }
+  }
 
   void _navigateTo(int page) {
     setState(() {
       _currentPage = page;
-      if (_bottomNavIndices.contains(page)) {
-        _lastBottomNavPage = page;
-      }
     });
+  }
+
+  // convert page index back to nav index for highlighting
+  int get _navIndex {
+    const map = {0: 0, 1: 1, 2: 3, 3: 4};
+    return map[_currentPage] ?? 0;
   }
 
   @override
   Widget build(BuildContext context) {
+    final state = context.watch<AppState>();
+    final hasPickedImage = state.profileImage != null;
+
     return Scaffold(
       key: _scaffoldKey,
-      appBar: _buildAppBar(),
+      backgroundColor: AppTheme.background,
+      appBar: _buildAppBar(state),
       drawer: DrawerMenu(
-        userName: DummyData.currentUser.name,
-        userEmail: DummyData.currentUser.email,
-        userImage: DummyData.currentUser.profileImage,
+        userName: state.name,
+        userEmail: state.email,
+        userImage: hasPickedImage
+            ? state.profileImage!.path
+            : 'assets/images/profile.jpg',
+        isNetworkImage: hasPickedImage,
         currentRoute: '/home',
         onHome: () {
           Navigator.pop(context);
@@ -66,7 +94,7 @@ class _MainShellState extends State<MainShell> {
         },
         onOutfits: () {
           Navigator.pop(context);
-          _navigateTo(4);
+          Navigator.pushNamed(context, '/outfits');
         },
         onCalendar: () {
           Navigator.pop(context);
@@ -74,7 +102,7 @@ class _MainShellState extends State<MainShell> {
         },
         onNotifications: () {
           Navigator.pop(context);
-          _navigateTo(5);
+          Navigator.pushNamed(context, '/notifications');
         },
         onProfile: () {
           Navigator.pop(context);
@@ -104,34 +132,26 @@ class _MainShellState extends State<MainShell> {
           const WardrobeBody(),
           const CalendarPlannerBody(),
           const ProfileBody(),
-          const OutfitSuggestionsBody(),
-          const NotificationsBody(),
         ],
       ),
       bottomNavigationBar: AppBottomNav(
-        currentIndex: _lastBottomNavPage,
-        onTap: (i) => _navigateTo(i),
+        currentIndex: _navIndex,
+        onTap: _onBottomNavTap,
       ),
-      floatingActionButton: _showFAB
-          ? FloatingActionButton(
-              onPressed: () {
-                if (_currentPage == 1) {
-                  Navigator.pushNamed(context, '/add-clothing');
-                } else {
-                  Navigator.pushNamed(context, '/outfits');
-                }
-              },
-              backgroundColor: AppTheme.primary,
-              child: const Icon(Icons.add, color: Colors.white),
-            )
-          : null,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => Navigator.pushNamed(context, '/ai-suggest'),
+        backgroundColor: AppTheme.primary,
+        foregroundColor: AppTheme.background,
+        elevation: 4,
+        shape: const CircleBorder(),
+        child: const Icon(Icons.auto_awesome, size: 28),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
   }
 
-  PreferredSizeWidget _buildAppBar() {
-    if (_isHome) {
-      return _buildHomeAppBar();
-    }
+  PreferredSizeWidget _buildAppBar(AppState state) {
+    if (_isHome) return _buildHomeAppBar(state);
     return AppBar(
       backgroundColor: AppTheme.surface,
       elevation: 0,
@@ -140,23 +160,11 @@ class _MainShellState extends State<MainShell> {
         icon: const Icon(Icons.menu_rounded, color: AppTheme.textPrimary),
         onPressed: () => _scaffoldKey.currentState?.openDrawer(),
       ),
-      actions: _currentPage == 5
-          ? [
-              TextButton(
-                onPressed: () {
-                  // Mark all read will be handled by body widget via callback
-                },
-                child: const Text(
-                  'Mark all read',
-                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13),
-                ),
-              ),
-            ]
-          : null,
     );
   }
 
-  PreferredSizeWidget _buildHomeAppBar() {
+  PreferredSizeWidget _buildHomeAppBar(AppState state) {
+    final hasPickedImage = state.profileImage != null;
     return AppBar(
       backgroundColor: AppTheme.surface,
       elevation: 0,
@@ -172,7 +180,7 @@ class _MainShellState extends State<MainShell> {
             ),
           ),
           Text(
-            '${DummyData.currentUser.name}!',
+            '${state.name}!',
             style: const TextStyle(
               fontSize: 20,
               fontWeight: FontWeight.w700,
@@ -189,24 +197,36 @@ class _MainShellState extends State<MainShell> {
         Padding(
           padding: const EdgeInsets.only(right: 16),
           child: GestureDetector(
-            onTap: () => _navigateTo(5),
+            onTap: () => _navigateTo(3),
             child: Stack(
               children: [
                 Container(
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: AppTheme.background,
+                    color: AppTheme.surfaceVariant,
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(14),
-                    child: CachedNetworkImage(
-                      imageUrl: DummyData.currentUser.profileImage,
-                      fit: BoxFit.cover,
-                      placeholder: (_, _) => const Icon(Icons.person, color: AppTheme.textSecondary),
-                      errorWidget: (_, _, _) => const Icon(Icons.person, color: AppTheme.textSecondary),
-                    ),
+                    child: hasPickedImage
+                        ? kIsWeb
+                              ? Image.network(
+                                  state.profileImage!.path,
+                                  fit: BoxFit.cover,
+                                )
+                              : Image.file(
+                                  File(state.profileImage!.path),
+                                  fit: BoxFit.cover,
+                                )
+                        : Image.asset(
+                            'assets/images/profile.jpg',
+                            fit: BoxFit.cover,
+                            errorBuilder: (_, _, _) => const Icon(
+                              Icons.person,
+                              color: AppTheme.textSecondary,
+                            ),
+                          ),
                   ),
                 ),
                 Positioned(
@@ -218,7 +238,7 @@ class _MainShellState extends State<MainShell> {
                     decoration: BoxDecoration(
                       color: AppTheme.error,
                       shape: BoxShape.circle,
-                      border: Border.all(color: Colors.white, width: 2),
+                      border: Border.all(color: AppTheme.surface, width: 2),
                     ),
                   ),
                 ),

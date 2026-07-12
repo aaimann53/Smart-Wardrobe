@@ -16,7 +16,9 @@ class _OutfitSuggestionsBodyState extends State<OutfitSuggestionsBody> {
 
   List<Outfit> get _filteredOutfits {
     if (_selectedOccasion == 'All') return DummyData.outfits;
-    return DummyData.outfits.where((o) => o.occasion == _selectedOccasion).toList();
+    return DummyData.outfits
+        .where((o) => o.occasion == _selectedOccasion)
+        .toList();
   }
 
   @override
@@ -38,12 +40,17 @@ class _OutfitSuggestionsBodyState extends State<OutfitSuggestionsBody> {
                   onTap: () => setState(() => _selectedOccasion = occ),
                   child: AnimatedContainer(
                     duration: const Duration(milliseconds: 250),
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 10,
+                    ),
                     decoration: BoxDecoration(
                       color: isSelected ? AppTheme.primary : AppTheme.surface,
                       borderRadius: BorderRadius.circular(22),
                       border: Border.all(
-                        color: isSelected ? AppTheme.primary : AppTheme.textSecondary.withValues(alpha: 0.15),
+                        color: isSelected
+                            ? AppTheme.primary
+                            : AppTheme.textSecondary.withValues(alpha: 0.15),
                       ),
                       boxShadow: isSelected ? AppTheme.softShadow : null,
                     ),
@@ -52,7 +59,9 @@ class _OutfitSuggestionsBodyState extends State<OutfitSuggestionsBody> {
                       style: TextStyle(
                         fontSize: 13,
                         fontWeight: FontWeight.w600,
-                        color: isSelected ? Colors.white : AppTheme.textSecondary,
+                        color: isSelected
+                            ? Colors.white
+                            : AppTheme.textSecondary,
                       ),
                     ),
                   ),
@@ -68,11 +77,19 @@ class _OutfitSuggestionsBodyState extends State<OutfitSuggestionsBody> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Icon(Icons.search_off_rounded, size: 64, color: AppTheme.textSecondary.withValues(alpha: 0.4)),
+                      Icon(
+                        Icons.search_off_rounded,
+                        size: 64,
+                        color: AppTheme.textSecondary.withValues(alpha: 0.4),
+                      ),
                       const SizedBox(height: 16),
                       const Text(
                         'No outfits found',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: AppTheme.textPrimary,
+                        ),
                       ),
                     ],
                   ),
@@ -90,7 +107,8 @@ class _OutfitSuggestionsBodyState extends State<OutfitSuggestionsBody> {
                     final outfit = _filteredOutfits[index];
                     return OutfitCard(
                       outfit: outfit,
-                      onLike: () => setState(() => outfit.isLiked = !outfit.isLiked),
+                      onLike: () =>
+                          setState(() => outfit.isLiked = !outfit.isLiked),
                       onTap: () => _showOutfitDetail(context, outfit),
                     );
                   },
@@ -141,13 +159,19 @@ class _OutfitSuggestionsBodyState extends State<OutfitSuggestionsBody> {
                     return Container(
                       height: 250,
                       color: AppTheme.background,
-                      child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                      child: const Center(
+                        child: CircularProgressIndicator(strokeWidth: 2),
+                      ),
                     );
                   },
                   errorBuilder: (_, _, _) => Container(
                     height: 250,
                     color: AppTheme.background,
-                    child: const Icon(Icons.broken_image, size: 48, color: AppTheme.textSecondary),
+                    child: const Icon(
+                      Icons.broken_image,
+                      size: 48,
+                      color: AppTheme.textSecondary,
+                    ),
                   ),
                 ),
               ),
@@ -167,15 +191,21 @@ class _OutfitSuggestionsBodyState extends State<OutfitSuggestionsBody> {
                   IconButton(
                     icon: Icon(
                       outfit.isLiked ? Icons.favorite : Icons.favorite_border,
-                      color: outfit.isLiked ? AppTheme.error : AppTheme.textSecondary,
+                      color: outfit.isLiked
+                          ? AppTheme.error
+                          : AppTheme.textSecondary,
                     ),
-                    onPressed: () => setState(() => outfit.isLiked = !outfit.isLiked),
+                    onPressed: () =>
+                        setState(() => outfit.isLiked = !outfit.isLiked),
                   ),
                 ],
               ),
               const SizedBox(height: 8),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
                 decoration: BoxDecoration(
                   color: AppTheme.accent.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(8),
@@ -211,7 +241,11 @@ class _OutfitSuggestionsBodyState extends State<OutfitSuggestionsBody> {
                           color: AppTheme.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: const Icon(Icons.check, size: 16, color: AppTheme.primary),
+                        child: const Icon(
+                          Icons.check,
+                          size: 16,
+                          color: AppTheme.primary,
+                        ),
                       ),
                       const SizedBox(width: 12),
                       Text(
@@ -236,7 +270,9 @@ class _OutfitSuggestionsBodyState extends State<OutfitSuggestionsBody> {
                       const SnackBar(
                         content: Text('Outfit added to your planner!'),
                         behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12))),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.all(Radius.circular(12)),
+                        ),
                       ),
                     );
                   },
@@ -245,7 +281,9 @@ class _OutfitSuggestionsBodyState extends State<OutfitSuggestionsBody> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primary,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
                     elevation: 0,
                   ),
                 ),

@@ -1,44 +1,24 @@
 class ImageConstants {
-  static const String fashionBg =
-      'https://images.unsplash.com/photo-1445205170230-053b83016050?w=800&q=80';
-  static const String fashionBg2 =
-      'https://images.unsplash.com/photo-1469334031218-e382a71b716b?w=800&q=80';
-  static const String fashionBg3 =
-      'https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?w=800&q=80';
-  static const String authHeader =
-      'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600&q=80';
-  static const String outfit1 =
-      'https://images.unsplash.com/photo-1434389677669-e08b4cda3a83?w=400&q=80';
-  static const String outfit2 =
-      'https://images.unsplash.com/photo-1490578474895-699cd4e2cf59?w=400&q=80';
-  static const String outfit3 =
-      'https://images.unsplash.com/photo-1470246973918-29a93221c455?w=400&q=80';
-  static const String outfit4 =
-      'https://images.unsplash.com/photo-1456885282011-8e51e0e5fa6b?w=400&q=80';
-  static const String casual1 =
-      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80';
-  static const String casual2 =
-      'https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80';
-  static const String formal1 =
-      'https://images.unsplash.com/photo-1593030761757-71fae45fa0e7?w=400&q=80';
-  static const String streetwear1 =
-      'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=400&q=80';
-  static const String dress1 =
-      'https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=400&q=80';
-  static const String dress2 =
-      'https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=400&q=80';
-  static const String jacket1 =
-      'https://images.unsplash.com/photo-1551028719-00167b16eac5?w=400&q=80';
-  static const String shoes1 =
-      'https://images.unsplash.com/photo-1608231387042-66d1773070a5?w=400&q=80';
-  static const String accessory1 =
-      'https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=400&q=80';
-  static const String weatherBg =
-      'https://images.unsplash.com/photo-1504608524841-42fe6f032b4b?w=600&q=80';
-  static const String profilePlaceholder =
-      'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=200&q=80';
-  static const String avatarPlaceholder =
-      'https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=200&q=80';
+  static const String fashionBg = 'assets/images/splashbg.jpg';
+  static const String fashionBg2 = 'assets/images/splashbg.jpg';
+  static const String fashionBg3 = 'assets/images/splashbg.jpg';
+  static const String authHeader = 'assets/images/auth_header.jpg';
+  static const String outfit1 = 'assets/images/outfit1.jpg';
+  static const String outfit2 = 'assets/images/outfit2.jpg';
+  static const String outfit3 = 'assets/images/outfit3.jpg';
+  static const String outfit4 = 'assets/images/outfit4.jpg';
+  static const String casual1 = 'assets/images/casual1.jpg';
+  static const String casual2 = 'assets/images/casual2.jpg';
+  static const String formal1 = 'assets/images/formal1.jpg';
+  static const String streetwear1 = 'assets/images/streetwear1.jpg';
+  static const String dress1 = 'assets/images/dress1.jpg';
+  static const String dress2 = 'assets/images/dress2.jpg';
+  static const String jacket1 = 'assets/images/jacket1.jpg';
+  static const String shoes1 = 'assets/images/shoes1.jpg';
+  static const String accessory1 = 'assets/images/accessory1.jpg';
+  static const String weatherBg = 'assets/images/weather_bg.jpg';
+  static const String profilePlaceholder = 'assets/images/profile.jpg';
+  static const String avatarPlaceholder = 'assets/images/avatar.jpg';
 }
 
 class AppStrings {

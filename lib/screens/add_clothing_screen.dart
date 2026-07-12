@@ -1,5 +1,11 @@
+import 'dart:io'; // ADD THIS
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
+import '../models/clothing_item.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_state.dart';
 import '../utils/dummy_data.dart';
 
 class AddClothingScreen extends StatefulWidget {
@@ -15,7 +21,8 @@ class _AddClothingScreenState extends State<AddClothingScreen> {
   String _selectedCategory = 'Tops';
   String _selectedColor = 'Blue';
   String _selectedSeason = 'All Season';
-  String? _imagePreview;
+  XFile? _pickedImage;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void dispose() {
@@ -23,9 +30,19 @@ class _AddClothingScreenState extends State<AddClothingScreen> {
     super.dispose();
   }
 
+  Future<void> _pickImage(ImageSource source) async {
+    final XFile? image = await _picker.pickImage(
+      source: source,
+      imageQuality: 80,
+    );
+    if (image != null) {
+      setState(() => _pickedImage = image);
+    }
+  }
+
   void _handleSave() {
     if (_formKey.currentState!.validate()) {
-      if (_imagePreview == null) {
+      if (_pickedImage == null) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: const Text('Please add an image of your clothing item'),
@@ -38,6 +55,20 @@ class _AddClothingScreenState extends State<AddClothingScreen> {
         );
         return;
       }
+
+      final newItem = ClothingItem(
+        id: DateTime.now().millisecondsSinceEpoch.toString(),
+        name: _nameController.text.trim(),
+        category: _selectedCategory,
+        subcategory: '',
+        color: _selectedColor,
+        season: _selectedSeason,
+        imageUrl: _pickedImage!.path,
+        isFavorite: false,
+      );
+
+      context.read<AppState>().addClothingItem(newItem);
+
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Row(
@@ -83,44 +114,38 @@ class _AddClothingScreenState extends State<AddClothingScreen> {
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: AppTheme.softShadow,
                 ),
-                child: _imagePreview != null
+                child: _pickedImage != null
                     ? ClipRRect(
                         borderRadius: BorderRadius.circular(24),
                         child: Stack(
                           fit: StackFit.expand,
                           children: [
-                            Image.network(
-                              _imagePreview!,
-                              fit: BoxFit.cover,
-                              loadingBuilder: (_, child, progress) {
-                                if (progress == null) return child;
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    value: progress.expectedTotalBytes != null
-                                        ? progress.cumulativeBytesLoaded / progress.expectedTotalBytes!
-                                        : null,
-                                    strokeWidth: 2,
+                            kIsWeb
+                                ? Image.network(
+                                    _pickedImage!.path,
+                                    fit: BoxFit.cover,
+                                  )
+                                : Image.file(
+                                    File(_pickedImage!.path),
+                                    fit: BoxFit.cover,
                                   ),
-                                );
-                              },
-                              errorBuilder: (_, _, _) => const Icon(
-                                Icons.broken_image,
-                                size: 48,
-                                color: AppTheme.textSecondary,
-                              ),
-                            ),
                             Positioned(
                               top: 12,
                               right: 12,
                               child: GestureDetector(
-                                onTap: () => setState(() => _imagePreview = null),
+                                onTap: () =>
+                                    setState(() => _pickedImage = null),
                                 child: Container(
                                   padding: const EdgeInsets.all(6),
                                   decoration: BoxDecoration(
                                     color: Colors.black.withValues(alpha: 0.5),
                                     shape: BoxShape.circle,
                                   ),
-                                  child: const Icon(Icons.close, color: Colors.white, size: 18),
+                                  child: const Icon(
+                                    Icons.close,
+                                    color: Colors.white,
+                                    size: 18,
+                                  ),
                                 ),
                               ),
                             ),
@@ -128,28 +153,19 @@ class _AddClothingScreenState extends State<AddClothingScreen> {
                         ),
                       )
                     : Center(
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                _imageButton(
-                                  icon: Icons.camera_alt_rounded,
-                                  label: 'Camera',
-                                  onTap: () => setState(
-                                    () => _imagePreview = 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=400&q=80',
-                                  ),
-                                ),
-                                const SizedBox(width: 20),
-                                _imageButton(
-                                  icon: Icons.photo_library_rounded,
-                                  label: 'Gallery',
-                                  onTap: () => setState(
-                                    () => _imagePreview = 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=400&q=80',
-                                  ),
-                                ),
-                              ],
+                            _imageButton(
+                              icon: Icons.camera_alt_rounded,
+                              label: 'Camera',
+                              onTap: () => _pickImage(ImageSource.camera),
+                            ),
+                            const SizedBox(width: 20),
+                            _imageButton(
+                              icon: Icons.photo_library_rounded,
+                              label: 'Gallery',
+                              onTap: () => _pickImage(ImageSource.gallery),
                             ),
                           ],
                         ),
@@ -160,7 +176,10 @@ class _AddClothingScreenState extends State<AddClothingScreen> {
               const SizedBox(height: 8),
               TextFormField(
                 controller: _nameController,
-                style: const TextStyle(fontSize: 15, color: AppTheme.textPrimary),
+                style: const TextStyle(
+                  fontSize: 15,
+                  color: AppTheme.textPrimary,
+                ),
                 decoration: InputDecoration(
                   hintText: 'e.g., White Linen Shirt',
                   hintStyle: TextStyle(
@@ -168,24 +187,38 @@ class _AddClothingScreenState extends State<AddClothingScreen> {
                     color: AppTheme.textSecondary.withValues(alpha: 0.6),
                   ),
                 ),
-                validator: (v) => v == null || v.isEmpty ? 'Please enter a name' : null,
+                validator: (v) =>
+                    v == null || v.isEmpty ? 'Please enter a name' : null,
               ),
               const SizedBox(height: 20),
               Row(
                 children: [
-                  Expanded(child: _buildDropdown('Category', _selectedCategory, DummyData.categories.skip(1).map((c) => c.name).toList(), (v) {
-                    setState(() => _selectedCategory = v!);
-                  })),
+                  Expanded(
+                    child: _buildDropdown(
+                      'Category',
+                      _selectedCategory,
+                      DummyData.categories.skip(1).map((c) => c.name).toList(),
+                      (v) => setState(() => _selectedCategory = v!),
+                    ),
+                  ),
                   const SizedBox(width: 12),
-                  Expanded(child: _buildDropdown('Color', _selectedColor, DummyData.colors, (v) {
-                    setState(() => _selectedColor = v!);
-                  })),
+                  Expanded(
+                    child: _buildDropdown(
+                      'Color',
+                      _selectedColor,
+                      DummyData.colors,
+                      (v) => setState(() => _selectedColor = v!),
+                    ),
+                  ),
                 ],
               ),
               const SizedBox(height: 16),
-              _buildDropdown('Season', _selectedSeason, DummyData.seasons, (v) {
-                setState(() => _selectedSeason = v!);
-              }),
+              _buildDropdown(
+                'Season',
+                _selectedSeason,
+                DummyData.seasons,
+                (v) => setState(() => _selectedSeason = v!),
+              ),
               const SizedBox(height: 32),
               SizedBox(
                 width: double.infinity,
@@ -199,7 +232,6 @@ class _AddClothingScreenState extends State<AddClothingScreen> {
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(18),
                     ),
-                    shadowColor: AppTheme.primary.withValues(alpha: 0.3),
                   ),
                   child: const Text(
                     'Save to Wardrobe',
@@ -263,7 +295,12 @@ class _AddClothingScreenState extends State<AddClothingScreen> {
     );
   }
 
-  Widget _buildDropdown(String label, String value, List<String> items, ValueChanged<String?> onChanged) {
+  Widget _buildDropdown(
+    String label,
+    String value,
+    List<String> items,
+    ValueChanged<String?> onChanged,
+  ) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -280,10 +317,17 @@ class _AddClothingScreenState extends State<AddClothingScreen> {
             child: DropdownButton<String>(
               value: value,
               isExpanded: true,
-              items: items.map((item) => DropdownMenuItem(value: item, child: Text(item))).toList(),
+              items: items
+                  .map(
+                    (item) => DropdownMenuItem(value: item, child: Text(item)),
+                  )
+                  .toList(),
               onChanged: onChanged,
               style: const TextStyle(fontSize: 15, color: AppTheme.textPrimary),
-              icon: const Icon(Icons.keyboard_arrow_down, color: AppTheme.textSecondary),
+              icon: const Icon(
+                Icons.keyboard_arrow_down,
+                color: AppTheme.textSecondary,
+              ),
             ),
           ),
         ),

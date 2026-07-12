@@ -1,4 +1,5 @@
-import 'package:cached_network_image/cached_network_image.dart';
+import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import '../utils/constants.dart';
@@ -7,6 +8,7 @@ class DrawerMenu extends StatelessWidget {
   final String userName;
   final String userEmail;
   final String userImage;
+  final bool isNetworkImage;
   final VoidCallback? onHome;
   final VoidCallback? onWardrobe;
   final VoidCallback? onOutfits;
@@ -22,6 +24,7 @@ class DrawerMenu extends StatelessWidget {
     required this.userName,
     required this.userEmail,
     required this.userImage,
+    this.isNetworkImage = false,
     this.onHome,
     this.onWardrobe,
     this.onOutfits,
@@ -32,6 +35,29 @@ class DrawerMenu extends StatelessWidget {
     this.onLogout,
     this.currentRoute = '/home',
   });
+
+  Widget _buildProfileImage() {
+    if (isNetworkImage) {
+      return kIsWeb
+          ? Image.network(
+              userImage,
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) =>
+                  const Icon(Icons.person, color: Colors.white),
+            )
+          : Image.file(
+              File(userImage),
+              fit: BoxFit.cover,
+              errorBuilder: (_, _, _) =>
+                  const Icon(Icons.person, color: Colors.white),
+            );
+    }
+    return Image.asset(
+      userImage,
+      fit: BoxFit.cover,
+      errorBuilder: (_, _, _) => const Icon(Icons.person, color: Colors.white),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -86,12 +112,7 @@ class DrawerMenu extends StatelessWidget {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(30),
-                        child: CachedNetworkImage(
-                          imageUrl: userImage,
-                          fit: BoxFit.cover,
-                          placeholder: (_, _) => Container(color: Colors.white24),
-                          errorWidget: (_, _, _) => const Icon(Icons.person, color: Colors.white),
-                        ),
+                        child: _buildProfileImage(),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -159,8 +180,13 @@ class DrawerMenu extends StatelessWidget {
                   onTap: onNotifications,
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  child: Divider(color: AppTheme.textSecondary.withValues(alpha: 0.2)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 8,
+                  ),
+                  child: Divider(
+                    color: AppTheme.textSecondary.withValues(alpha: 0.2),
+                  ),
                 ),
                 _drawerItem(
                   icon: Icons.person_rounded,
@@ -175,8 +201,13 @@ class DrawerMenu extends StatelessWidget {
                   onTap: onSettings,
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                  child: Divider(color: AppTheme.textSecondary.withValues(alpha: 0.2)),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 8,
+                  ),
+                  child: Divider(
+                    color: AppTheme.textSecondary.withValues(alpha: 0.2),
+                  ),
                 ),
                 _drawerItem(
                   icon: Icons.logout_rounded,
@@ -245,8 +276,8 @@ class DrawerMenu extends StatelessWidget {
           color: isDestructive
               ? AppTheme.error
               : isActive
-                  ? AppTheme.primary
-                  : AppTheme.textSecondary,
+              ? AppTheme.primary
+              : AppTheme.textSecondary,
           size: 24,
         ),
         title: Text(
@@ -257,8 +288,8 @@ class DrawerMenu extends StatelessWidget {
             color: isDestructive
                 ? AppTheme.error
                 : isActive
-                    ? AppTheme.primary
-                    : AppTheme.textPrimary,
+                ? AppTheme.primary
+                : AppTheme.textPrimary,
           ),
         ),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),

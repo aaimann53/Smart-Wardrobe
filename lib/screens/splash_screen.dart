@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../theme/app_theme.dart';
@@ -25,9 +24,10 @@ class _SplashScreenState extends State<SplashScreen>
       vsync: this,
       duration: const Duration(milliseconds: 1200),
     );
-    _fadeAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
-    );
+    _fadeAnimation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: _controller, curve: Curves.easeIn));
     _slideAnimation = Tween<Offset>(
       begin: const Offset(0, 0.3),
       end: Offset.zero,
@@ -47,13 +47,12 @@ class _SplashScreenState extends State<SplashScreen>
     return Scaffold(
       body: Stack(
         children: [
-          CachedNetworkImage(
-            imageUrl: ImageConstants.fashionBg2,
+          Image.asset(
+            ImageConstants.fashionBg2,
             width: double.infinity,
             height: double.infinity,
             fit: BoxFit.cover,
-            placeholder: (_, _) => Container(color: AppTheme.textPrimary),
-            errorWidget: (_, _, _) => Container(color: AppTheme.textPrimary),
+            errorBuilder: (_, _, _) => Container(color: AppTheme.textPrimary),
           ),
           Container(
             width: double.infinity,

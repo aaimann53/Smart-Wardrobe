@@ -1,6 +1,7 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../theme/app_theme.dart';
+import '../utils/app_state.dart';
 import '../utils/constants.dart';
 import '../utils/dummy_data.dart';
 import '../widgets/custom_text_field.dart';
@@ -52,6 +53,15 @@ class _RegisterScreenState extends State<RegisterScreen> {
       Future.delayed(const Duration(seconds: 1), () {
         if (mounted) {
           setState(() => _isLoading = false);
+
+          // Save the actual user input to AppState
+          context.read<AppState>().updateProfile(
+            newName: _nameController.text.trim(),
+            newEmail: _emailController.text.trim(),
+            newStyle: _selectedStyle,
+            newColor: _selectedColor,
+          );
+
           Navigator.pushReplacementNamed(context, '/home');
         }
       });
@@ -81,13 +91,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(45),
-                        child: CachedNetworkImage(
-                          imageUrl: ImageConstants.avatarPlaceholder,
+                        child: Image.asset(
+                          ImageConstants.avatarPlaceholder,
                           fit: BoxFit.cover,
-                          placeholder: (_, _) => Container(color: AppTheme.background),
-                          errorWidget: (_, _, _) => Container(
+                          errorBuilder: (_, _, _) => Container(
                             color: AppTheme.background,
-                            child: const Icon(Icons.person, size: 40, color: AppTheme.textSecondary),
+                            child: const Icon(
+                              Icons.person,
+                              size: 40,
+                              color: AppTheme.textSecondary,
+                            ),
                           ),
                         ),
                       ),
@@ -103,7 +116,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           shape: BoxShape.circle,
                           border: Border.all(color: Colors.white, width: 2),
                         ),
-                        child: const Icon(Icons.camera_alt, size: 16, color: Colors.white),
+                        child: const Icon(
+                          Icons.camera_alt,
+                          size: 16,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ],
@@ -212,7 +229,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         ),
                         activeColor: AppTheme.primary,
                         side: BorderSide(
-                          color: _acceptTerms ? AppTheme.primary : AppTheme.textSecondary,
+                          color: _acceptTerms
+                              ? AppTheme.primary
+                              : AppTheme.textSecondary,
                           width: 1.5,
                         ),
                       ),
@@ -302,11 +321,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 return DropdownMenuItem(value: item, child: Text(item));
               }).toList(),
               onChanged: onChanged,
-              style: const TextStyle(
-                fontSize: 15,
-                color: AppTheme.textPrimary,
+              style: const TextStyle(fontSize: 15, color: AppTheme.textPrimary),
+              icon: const Icon(
+                Icons.keyboard_arrow_down,
+                color: AppTheme.textSecondary,
               ),
-              icon: const Icon(Icons.keyboard_arrow_down, color: AppTheme.textSecondary),
             ),
           ),
         ),

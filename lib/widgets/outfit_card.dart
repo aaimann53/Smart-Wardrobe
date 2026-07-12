@@ -1,4 +1,3 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import '../models/outfit.dart';
 import '../theme/app_theme.dart';
@@ -8,12 +7,7 @@ class OutfitCard extends StatelessWidget {
   final VoidCallback? onTap;
   final VoidCallback? onLike;
 
-  const OutfitCard({
-    super.key,
-    required this.outfit,
-    this.onTap,
-    this.onLike,
-  });
+  const OutfitCard({super.key, required this.outfit, this.onTap, this.onLike});
 
   @override
   Widget build(BuildContext context) {
@@ -29,32 +23,33 @@ class OutfitCard extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             ClipRRect(
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(20),
+              ),
               child: Stack(
                 children: [
-                  CachedNetworkImage(
-                    imageUrl: outfit.imageUrl,
+                  Image.asset(
+                    outfit.imageUrl,
                     height: 200,
                     width: double.infinity,
                     fit: BoxFit.cover,
-                    placeholder: (_, _) => Container(
+                    errorBuilder: (_, _, _) => Container(
                       height: 200,
                       color: AppTheme.background,
-                      child: const Center(
-                        child: CircularProgressIndicator(strokeWidth: 2),
+                      child: const Icon(
+                        Icons.broken_image,
+                        color: AppTheme.textSecondary,
                       ),
-                    ),
-                    errorWidget: (_, _, _) => Container(
-                      height: 200,
-                      color: AppTheme.background,
-                      child: const Icon(Icons.broken_image, color: AppTheme.textSecondary),
                     ),
                   ),
                   Positioned(
                     top: 12,
                     left: 12,
                     child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 12,
+                        vertical: 6,
+                      ),
                       decoration: BoxDecoration(
                         color: AppTheme.accent,
                         borderRadius: BorderRadius.circular(20),
@@ -83,9 +78,13 @@ class OutfitCard extends StatelessWidget {
                           boxShadow: AppTheme.softShadow,
                         ),
                         child: Icon(
-                          outfit.isLiked ? Icons.favorite : Icons.favorite_border,
+                          outfit.isLiked
+                              ? Icons.favorite
+                              : Icons.favorite_border,
                           size: 20,
-                          color: outfit.isLiked ? AppTheme.error : AppTheme.textSecondary,
+                          color: outfit.isLiked
+                              ? AppTheme.error
+                              : AppTheme.textSecondary,
                         ),
                       ),
                     ),
@@ -112,7 +111,11 @@ class OutfitCard extends StatelessWidget {
                       padding: const EdgeInsets.only(bottom: 3),
                       child: Row(
                         children: [
-                          const Icon(Icons.check_circle, size: 14, color: AppTheme.primary),
+                          const Icon(
+                            Icons.check_circle,
+                            size: 14,
+                            color: AppTheme.primary,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(

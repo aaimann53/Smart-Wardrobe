@@ -29,11 +29,19 @@ class _NotificationsBodyState extends State<NotificationsBody> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Icon(Icons.notifications_off_rounded, size: 64, color: AppTheme.textSecondary.withValues(alpha: 0.4)),
+                Icon(
+                  Icons.notifications_off_rounded,
+                  size: 64,
+                  color: AppTheme.textSecondary.withValues(alpha: 0.4),
+                ),
                 const SizedBox(height: 16),
                 const Text(
                   'No notifications yet',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600, color: AppTheme.textPrimary),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: AppTheme.textPrimary,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 const Text(
@@ -48,7 +56,10 @@ class _NotificationsBodyState extends State<NotificationsBody> {
               if (_unreadCount > 0)
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 10,
+                  ),
                   child: Row(
                     children: [
                       Container(
