@@ -1,1 +1,44 @@
-{"flutter":{"platforms":{"android":{"default":{"projectId":"smartwardrobe-33757","appId":"1:105082242698:android:8bd836432d52226f454f73","fileOutput":"android/app/google-services.json"}},"dart":{"lib/firebase_options.dart":{"projectId":"smartwardrobe-33757","configurations":{"android":"1:105082242698:android:8bd836432d52226f454f73","ios":"1:105082242698:ios:141620e6e21d44c0454f73","macos":"1:105082242698:ios:141620e6e21d44c0454f73","web":"1:105082242698:web:f455595e2d9728c2454f73","windows":"1:105082242698:web:1b436cb13f896ea4454f73"}}}}}}
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "smart-wardrobe-aiman",
+          "appId": "1:577840057220:android:599f878f66305ca6462bd1",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "smart-wardrobe-aiman",
+          "configurations": {
+            "android": "1:577840057220:android:599f878f66305ca6462bd1",
+            "ios": "1:577840057220:ios:bade8db1769eebbf462bd1",
+            "macos": "1:577840057220:ios:bade8db1769eebbf462bd1",
+            "web": "1:577840057220:web:287914f4f9ea063a462bd1",
+            "windows": "1:577840057220:web:1592175712e71059462bd1"
+          }
+        }
+      }
+    }
+  },
+  "functions": {
+    "source": "functions",
+    "runtime": "nodejs18",
+    "codebase": "default",
+    "ignore": [
+      "node_modules",
+      ".git",
+      "firebase-debug.log",
+      "firebase-debug.*.log",
+      "*.local"
+    ],
+    "predeploy": [
+      "npm --prefix \"$RESOURCE_DIR\" run build"
+    ]
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}

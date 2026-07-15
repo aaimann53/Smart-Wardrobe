@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "577840057220",
+    "project_id": "smart-wardrobe-aiman",
+    "storage_bucket": "smart-wardrobe-aiman.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:577840057220:android:599f878f66305ca6462bd1",
+        "android_client_info": {
+          "package_name": "com.example.smartwardrobe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD35HvV6yADo9b5Gqq7D9BjzaKJ-J9FtF0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

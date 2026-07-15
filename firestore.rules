@@ -1,0 +1,117 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ── Users Collection ─────────────────────────────────────────────
+    match /users/{userId} {
+
+      // Profile document rules
+      allow read: if request.auth != null && request.auth.uid == userId;
+
+      allow create: if request.auth != null
+                    && request.auth.uid == userId
+                    && isValidProfile(request.resource.data);
+
+      allow update: if request.auth != null
+                    && request.auth.uid == userId
+                    && isValidProfileUpdate(request.resource.data);
+
+      allow delete: if request.auth != null && request.auth.uid == userId;
+
+      // ── Clothing Items Sub-Collection ──────────────────────────────
+      match /clothingItems/{itemId} {
+
+        allow read: if request.auth != null && request.auth.uid == userId;
+
+        allow create: if request.auth != null
+                      && request.auth.uid == userId
+                      && isValidClothingItem(request.resource.data);
+
+        allow update: if request.auth != null
+                      && request.auth.uid == userId
+                      && isValidClothingItemUpdate(request.resource.data);
+
+        allow delete: if request.auth != null && request.auth.uid == userId;
+      }
+    }
+
+    // Deny all other access
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // ── Validation Functions ─────────────────────────────────────────
+
+    function isValidProfile(data) {
+      let validStyles = [
+        'Casual', 'Formal', 'Streetwear', 'Bohemian', 'Minimalist',
+        'Sporty', 'Vintage', 'Preppy', 'Grunge', 'Classic'
+      ];
+      let validWardrobeTypes = ['male', 'female'];
+
+      return data.keys().hasAll(['name', 'email', 'favoriteStyle', 'favoriteColor', 'wardrobeType'])
+             && data.name is string
+             && data.name.size() > 0
+             && data.name.size() <= 50
+             && data.email is string
+             && data.email.size() > 0
+             && data.email.size() <= 255
+             && data.email.matches('.*@.*\\..*')
+             && data.favoriteStyle in validStyles
+             && data.favoriteColor is string
+             && data.favoriteColor.size() > 0
+             && data.wardrobeType in validWardrobeTypes;
+    }
+
+    function isValidProfileUpdate(data) {
+      let validStyles = [
+        'Casual', 'Formal', 'Streetwear', 'Bohemian', 'Minimalist',
+        'Sporty', 'Vintage', 'Preppy', 'Grunge', 'Classic'
+      ];
+      let validWardrobeTypes = ['male', 'female'];
+
+      return (!data.keys().hasAny(['name']) || (data.name is string && data.name.size() > 0 && data.name.size() <= 50))
+             && (!data.keys().hasAny(['email']) || (data.email is string && data.email.size() > 0 && data.email.size() <= 255))
+             && (!data.keys().hasAny(['favoriteStyle']) || data.favoriteStyle in validStyles)
+             && (!data.keys().hasAny(['favoriteColor']) || (data.favoriteColor is string && data.favoriteColor.size() > 0))
+             && (!data.keys().hasAny(['wardrobeType']) || data.wardrobeType in validWardrobeTypes);
+    }
+
+    function isValidClothingItem(data) {
+      let validCategories = [
+        'Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Footwear',
+        'Accessories', 'Activewear', 'Sleepwear', 'Swimwear', 'Formal Wear'
+      ];
+      let validSeasons = ['Spring', 'Summer', 'Fall', 'Winter', 'All Season'];
+
+      return data.keys().hasAll(['id', 'name', 'category', 'color', 'season'])
+             && data.id is string
+             && data.id.size() > 0
+             && data.name is string
+             && data.name.size() > 0
+             && data.name.size() <= 60
+             && data.category in validCategories
+             && data.color is string
+             && data.color.size() > 0
+             && data.season in validSeasons
+             && (!data.keys().hasAny(['isFavorite']) || data.isFavorite is bool)
+             && (!data.keys().hasAny(['dressPieces']) || (data.dressPieces is number && data.dressPieces >= 0 && data.dressPieces <= 10));
+    }
+
+    function isValidClothingItemUpdate(data) {
+      let validCategories = [
+        'Tops', 'Bottoms', 'Dresses', 'Outerwear', 'Footwear',
+        'Accessories', 'Activewear', 'Sleepwear', 'Swimwear', 'Formal Wear'
+      ];
+      let validSeasons = ['Spring', 'Summer', 'Fall', 'Winter', 'All Season'];
+
+      return (!data.keys().hasAny(['name']) || (data.name is string && data.name.size() > 0 && data.name.size() <= 60))
+             && (!data.keys().hasAny(['category']) || data.category in validCategories)
+             && (!data.keys().hasAny(['color']) || (data.color is string && data.color.size() > 0))
+             && (!data.keys().hasAny(['season']) || data.season in validSeasons)
+             && (!data.keys().hasAny(['isFavorite']) || data.isFavorite is bool)
+             && (!data.keys().hasAny(['dressPieces']) || (data.dressPieces is number && data.dressPieces >= 0 && data.dressPieces <= 10));
+    }
+  }
+}

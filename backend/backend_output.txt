@@ -1,0 +1,13 @@
+Smart Wardrobe server running on port 8080
+Endpoints:
+  GET    /health
+  GET    /api/profile
+  POST   /api/profile
+  PUT    /api/profile
+  DELETE /api/profile
+  GET    /api/clothing
+  POST   /api/clothing
+  PUT    /api/clothing/:id
+  DELETE /api/clothing/:id
+  PUT    /api/clothing/:id/favorite
+2026-07-15T21:19:43.891619  0:00:00.077050 GET     [200] /health
